@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lumina Studio — محرر التدرجات المحترف</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body data-theme="dark" dir="rtl">
+
+  <div class="ambience">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <main class="app-container">
+    
+    <aside class="panel">
+      <header>
+        <div class="brand">
+          <div class="logo-box">LS</div>
+          <h1 data-i18n="appTitle">Lumina Studio</h1>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <div class="lang-dropdown-container">
+            <button id="langToggle" class="lang-toggle" title="تبديل اللغة">🌐 AR</button>
+            <div id="langDropdown" class="lang-dropdown-menu">
+              <button data-lang="ar" class="lang-option active">🇸🇦 العربية</button>
+              <button data-lang="en" class="lang-option">🇺🇸 English</button>
+              <button data-lang="fr" class="lang-option">🇫🇷 Français</button>
+              <button data-lang="es" class="lang-option">🇪🇸 Español</button>
+              <button data-lang="de" class="lang-option">🇩🇪 Deutsch</button>
+              <button data-lang="zh" class="lang-option">🇨🇳 中文</button>
+              <button data-lang="ja" class="lang-option">🇯🇵 日本語</button>
+              <button data-lang="ru" class="lang-option">🇷🇺 Русский</button>
+              <button data-lang="tr" class="lang-option">🇹🇷 Türkçe</button>
+              <button data-lang="pt" class="lang-option">🇵🇹 Português</button>
+              <button data-lang="hi" class="lang-option">🇮🇳 हिन्दी</button>
+              <button data-lang="ko" class="lang-option">🇰🇷 한국어</button>
+              <button data-lang="it" class="lang-option">🇮🇹 Italiano</button>
+            </div>
+          </div>
+          <button id="userAccountBtn" class="user-account-btn" title="حساب المستخدم">
+            <div class="user-avatar" id="userAvatar">👤</div>
+            <span class="user-name" id="userName" data-i18n="signIn">تسجيل الدخول</span>
+          </button>
+          <button id="themeToggle" class="btn-icon" title="تبديل السمة">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="sidebar-content arabic-text">
+        <section>
+          <div class="spread" style="margin-bottom:8px">
+            <h2 data-i18n="smartGenerator">مولد التناغم</h2>
+          </div>
+          <div class="control-group">
+            <label data-i18n="baseColor">اللون الأساسي</label>
+            <div class="row" style="margin-bottom:12px">
+              <div class="base-color-preview" id="baseColorPreview" style="background-color: #6366F1;">
+                <input id="genBaseColor" type="color" value="#6366f1" class="base-color-picker-trigger">
+              </div>
+              <input id="genBaseHex" type="text" value="#6366F1" class="hex-input">
+            </div>
+            
+            <label data-i18n="harmonyMode">عدد الألوان</label>
+            <select id="genMode" style="margin-bottom:12px">
+              <option value="random" data-i18n="randomCount">عشوائي (2-5)</option>
+              <option value="2" data-i18n="twoColors">لونين</option>
+              <option value="3" selected data-i18n="threeColors">3 ألوان</option>
+              <option value="4" data-i18n="fourColors">4 ألوان</option>
+              <option value="5" data-i18n="fiveColors">5 ألوان</option>
+            </select>
+            
+            <label style="margin-top:12px" data-i18n="basePosition">موقع اللون الأساسي</label>
+            <select id="basePosition" style="margin-bottom:12px">
+              <option value="start" selected data-i18n="atStart">في البداية</option>
+              <option value="end" data-i18n="atEnd">في النهاية</option>
+              <option value="middle" data-i18n="inMiddle">في المنتصف</option>
+              <option value="random" data-i18n="randomPosition">عشوائي</option>
+            </select>
+            
+            <button id="btnSmartGenerate" class="btn btn-primary" style="width:100%" data-i18n="generatePalette">إنشاء تناغم جديد</button>
+          </div>
+        </section>
+
+        <section>
+          <div class="spread" style="margin-bottom:8px">
+            <h2 data-i18n="colorStops">نقاط الألوان</h2>
+            <div style="display:flex; gap:8px">
+               <button id="btnRandom" class="btn-icon" title="عشوائي كلي" data-i18n-title="randomize">🎲</button>
+               <button id="btnAddColor" class="btn-icon" title="إضافة نقطة" data-i18n-title="addStop">➕</button>
+            </div>
+          </div>
+          
+          <div id="colorList" class="color-stack">
+            </div>
+        </section>
+
+        <section>
+           <h2 data-i18n="configuration">الإعدادات</h2>
+           <div class="control-group">
+             <div class="spread">
+               <label data-i18n="stepsPrecision">الخطوات / الدقة</label>
+               <span id="stepsVal" class="muted font-mono">15</span>
+             </div>
+             
+             <div class="steps-controls">
+               <button id="stepsDecrease" class="step-btn">−</button>
+               <div class="steps-slider-container">
+                 <input id="stepsInput" type="range" min="2" max="100" value="15">
+               </div>
+               <button id="stepsIncrease" class="step-btn">+</button>
+             </div>
+
+             <div class="spread" style="margin-top:16px">
+               <label for="checkVivid" style="margin:0; cursor:pointer" data-i18n="vividMode">الوضع الحيوي (LAB)</label>
+               <input id="checkVivid" type="checkbox" class="toggle">
+             </div>
+             <p class="muted" style="margin-top:8px; font-size:0.75rem; line-height:1.4" data-i18n="vividDescription">استيفاء موحد إدراكياً يمنع 'المناطق الرمادية الميتة' في التدرجات.</p>
+           </div>
+        </section>
+      </div>
+    </aside>
+
+    <section class="preview-section">
+      <div class="toolbar">
+        <div class="row">
+          <button id="openPresetsBtn" class="btn btn-ghost" data-i18n="gallery">المعرض</button>
+          <button id="openBreakdownBtn" class="btn btn-ghost" data-i18n="analyze">تحليل</button>
+          <button id="saveGradientBtn" class="btn btn-ghost" data-i18n="saveGradient">حفظ التدرج</button>
+        </div>
+        
+        <div class="dropdown-container">
+          <button id="btnExportToggle" class="btn btn-primary" data-i18n="downloadExport">تنزيل / تصدير</button>
+          <div id="exportMenu" class="dropdown-menu">
+             <button id="actCopyCSS" class="menu-item" data-i18n="copyCSS">📋 نسخ CSS</button>
+             <button id="actCopyTailwind" class="menu-item" data-i18n="copyTailwind">💨 نسخ Tailwind</button>
+             <hr style="border:0; border-top:1px solid var(--border-subtle); margin:4px 0">
+             <button id="actDownloadCSS" class="menu-item" data-i18n="downloadCSS">📄 تنزيل .CSS</button>
+             <button id="actDownloadPNG" class="menu-item" data-i18n="downloadPNG">🖼️ تنزيل .PNG</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <div id="previewBox" role="img" aria-label="معاينة التدرج"></div>
+        <div class="code-floater" id="cssPreviewTrigger" title="انقر للنسخ" data-i18n-title="clickToCopy">
+          <span id="cssPreviewText" style="opacity:0.8">linear-gradient(...)</span>
+          <span style="opacity:0.5; font-size:0.75rem; margin-left:12px" data-i18n="clickToCopy">انقر للنسخ</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="spread" style="margin-bottom:8px">
+          <h2 data-i18n="gradientSpectrum">طيف التدرج</h2>
+          <span class="muted" style="font-size:0.75rem" data-i18n="spectrumHint">مرر للتحديد، انقر للنسخ</span>
+        </div>
+        <div id="stepsGrid" class="steps-strip"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="presetsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 data-i18n="gradientGallery">معرض التدرجات</h3>
+        <button class="btn-icon close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="margin-bottom: 12px;" data-i18n="builtinGradients">التدرجات المضمنة</h4>
+        <div id="presetsGrid" class="preset-grid"></div>
+        
+        <div class="user-gradients-section">
+          <div class="spread">
+            <h4 style="margin-bottom: 12px;" data-i18n="mySavedGradients">تدرجاتي المحفوظة</h4>
+            <button id="clearSavedGradients" class="btn btn-ghost btn-small" style="font-size: 0.75rem;" data-i18n="clearAll">مسح الكل</button>
+          </div>
+          <div id="userGradientsGrid" class="user-gradients-grid">
+            <!-- User saved gradients will appear here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="breakdownModal" class="modal-overlay">
+    <div class="modal-card" style="max-width:600px">
+      <div class="modal-header">
+        <h3 data-i18n="colorAnalysis">تحليل الألوان</h3>
+        <button class="btn-icon close-breakdown">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="breakGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(60px,1fr)); gap:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="authModalTitle" data-i18n="signIn">تسجيل الدخول</h3>
+        <button class="btn-icon close-auth-modal">✕</button>
+      </div>
+      <div class="modal-body arabic-text">
+        <div class="auth-error" id="authError"></div>
+        
+        <div class="auth-form" id="signInForm">
+          <div class="auth-form-header">
+            <h3 data-i18n="welcomeBack">مرحباً بعودتك</h3>
+            <p data-i18n="signInToContinue">سجل الدخول للمتابعة إلى Lumina Studio</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="signInEmail" data-i18n="emailAddress">البريد الإلكتروني</label>
+            <input type="email" id="signInEmail" placeholder="example@email.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="signInPassword" data-i18n="password">كلمة المرور</label>
+            <input type="password" id="signInPassword" placeholder="••••••••">
+          </div>
+          
+          <div class="form-actions">
+            <button id="signInBtn" class="btn btn-primary" data-i18n="signIn">
+              <span class="btn-text">تسجيل الدخول</span>
+              <span class="spinner" style="display: none;"></span>
+            </button>
+            
+            <div class="auth-divider">
+              <span data-i18n="orContinueWith">أو تابع باستخدام</span>
+            </div>
+            
+            <button id="googleSignInBtn" class="google-signin-btn">
+              <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span data-i18n="signInWithGoogle">تسجيل الدخول بواسطة Google</span>
+            </button>
+          </div>
+          
+          <div class="auth-switch">
+            <span data-i18n="dontHaveAccount">ليس لديك حساب؟</span>
+            <a id="switchToSignUp" data-i18n="signUp">إنشاء حساب</a>
+          </div>
+        </div>
+        
+        <div class="auth-form" id="signUpForm" style="display: none;">
+          <div class="auth-form-header">
+            <h3 data-i18n="createAccount">إنشاء حساب</h3>
+            <p data-i18n="joinLuminaStudio">انضم إلى Lumina Studio لحفظ عملك</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="signUpName" data-i18n="fullName">الاسم الكامل</label>
+            <input type="text" id="signUpName" placeholder="الاسم الكامل">
+          </div>
+          
+          <div class="form-group">
+            <label for="signUpEmail" data-i18n="emailAddress">البريد الإلكتروني</label>
+            <input type="email" id="signUpEmail" placeholder="example@email.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="signUpPassword" data-i18n="password">كلمة المرور</label>
+            <input type="password" id="signUpPassword" placeholder="••••••••">
+          </div>
+          
+          <div class="form-group">
+            <label for="signUpConfirmPassword" data-i18n="confirmPassword">تأكيد كلمة المرور</label>
+            <input type="password" id="signUpConfirmPassword" placeholder="••••••••">
+          </div>
+          
+          <div class="form-actions">
+            <button id="signUpBtn" class="btn btn-primary" data-i18n="createAccount">
+              <span class="btn-text">إنشاء حساب</span>
+              <span class="spinner" style="display: none;"></span>
+            </button>
+            
+            <div class="auth-divider">
+              <span data-i18n="orContinueWith">أو تابع باستخدام</span>
+            </div>
+            
+            <button id="googleSignUpBtn" class="google-signin-btn">
+              <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span data-i18n="signUpWithGoogle">التسجيل بواسطة Google</span>
+            </button>
+          </div>
+          
+          <div class="auth-switch">
+            <span data-i18n="alreadyHaveAccount">لديك حساب بالفعل؟</span>
+            <a id="switchToSignIn" data-i18n="signIn">تسجيل الدخول</a>
+          </div>
+        </div>
+        
+        <div class="auth-form" id="userProfile" style="display: none;">
+          <div class="auth-form-header">
+            <h3 id="profileUserName">الملف الشخصي</h3>
+            <p id="profileUserEmail">user@example.com</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="profileName" data-i18n="fullName">الاسم الكامل</label>
+            <input type="text" id="profileName" placeholder="الاسم الكامل">
+          </div>
+          
+          <div class="form-group">
+            <label for="profileEmail" data-i18n="emailAddress">البريد الإلكتروني</label>
+            <input type="email" id="profileEmail" placeholder="example@email.com">
+          </div>
+          
+          <div class="form-actions">
+            <button id="updateProfileBtn" class="btn btn-primary" data-i18n="updateProfile">
+              <span class="btn-text">تحديث الملف الشخصي</span>
+              <span class="spinner" style="display: none;"></span>
+            </button>
+            <button id="signOutBtn" class="btn btn-ghost" data-i18n="signOut">تسجيل الخروج</button>
+          </div>
+          
+          <div class="auth-switch">
+            <span data-i18n="accountSynced">بياناتك متزامنة تلقائياً مع حسابك</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">تم تنفيذ الإجراء</div>
+  <canvas id="exportCanvas" style="display:none"></canvas>
+
+  <script src="app.js"></script>
+</body>
+</html>
